@@ -57,15 +57,15 @@ if st.sidebar.button("🔍 Analyse", use_container_width=True):
     with st.spinner("Contacting API …"):
         try:
             # /predict
-            pred_resp = requests.post(f"{API_URL}/predict", json=payload, timeout=10)
+            pred_resp = requests.post(f"{API_URL}/predict", json=payload, timeout=30)
             pred_data = pred_resp.json()
 
             # /optimize
-            opt_resp = requests.post(f"{API_URL}/optimize", json=payload, timeout=10)
+            opt_resp = requests.post(f"{API_URL}/optimize", json=payload, timeout=30)
             opt_data = opt_resp.json()
 
             # /cluster
-            clust_resp = requests.post(f"{API_URL}/cluster", json=payload, timeout=10)
+            clust_resp = requests.post(f"{API_URL}/cluster", json=payload, timeout=30)
             clust_data = clust_resp.json()
 
         except requests.exceptions.ConnectionError:
