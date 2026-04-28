@@ -9,11 +9,11 @@ energy predictions, CO₂ estimates, cluster labels, and optimisation tips.
 import streamlit as st
 import requests
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = "https://carbon-footprint-optimization-in-iot-ty6w.onrender.com"
 
 # ── page config ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="🌱 Carbon Footprint Optimizer",
+    page_title="Carbon Footprint Optimizer",
     page_icon="🌿",
     layout="centered",
 )
