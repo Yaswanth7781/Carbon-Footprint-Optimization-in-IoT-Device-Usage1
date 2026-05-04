@@ -1,25 +1,3 @@
-# ────────────────────────────────────────────────────────────
-#  Carbon Footprint Optimization — Multi-Model Comparison
-# ────────────────────────────────────────────────────────────
-"""
-Compare multiple regression models for predicting energy consumption,
-print a side-by-side comparison table, and save the best performer.
-
-Models compared:
-    1. XGBRegressor
-    2. Random Forest Regressor
-    3. Gradient Boosting Regressor
-    4. Support Vector Regressor (SVR)
-    5. Linear Regression
-    6. Decision Tree Regressor
-    7. K-Nearest Neighbors Regressor
-
-Saves (best model):
-    models/model.pkl         – best trained model
-    models/scaler.pkl        – fitted StandardScaler
-    models/label_encoder.pkl – fitted LabelEncoder for device names
-"""
-
 import os
 import sys
 import time
@@ -30,7 +8,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-# ── Models ─────────────────────────────────────────────────
 from xgboost import XGBRegressor
 from sklearn.ensemble import (
     RandomForestRegressor,
@@ -41,7 +18,6 @@ from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.neighbors import KNeighborsRegressor
 
-# ── paths ──────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(BASE_DIR, "data", "iot_energy_large.csv")
 MODEL_DIR = os.path.join(BASE_DIR, "models")
@@ -50,7 +26,6 @@ os.makedirs(MODEL_DIR, exist_ok=True)
 
 
 def build_models() -> dict:
-    """Return a dict of {name: model_instance}."""
     return {
         "XGBoost": XGBRegressor(
             n_estimators=300, max_depth=6, learning_rate=0.1,
@@ -72,7 +47,6 @@ def build_models() -> dict:
 
 
 def evaluate(model, X_test, y_test):
-    """Return (MAE, RMSE, R²) for a fitted model."""
     y_pred = model.predict(X_test)
     mae  = mean_absolute_error(y_test, y_pred)
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
@@ -81,12 +55,10 @@ def evaluate(model, X_test, y_test):
 
 
 def main():
-    # 1. Load data ────────────────────────────────────────────
-    print("📂 Loading dataset …")
+    print("Loading dataset …")
     df = pd.read_csv(DATA_PATH)
     print(f"   Rows: {len(df)}  |  Columns: {list(df.columns)}\n")
 
-    # 2. Feature engineering ──────────────────────────────────
     df["co2"] = df["energy"] / 1000 * 0.82
 
     le = LabelEncoder()
@@ -104,9 +76,8 @@ def main():
         X_scaled, y, test_size=0.2, random_state=42,
     )
 
-    # 3. Train & evaluate every model ─────────────────────────
     models = build_models()
-    results = []       # [(name, mae, rmse, r2, train_time, model)]
+    results = []
 
     print("=" * 72)
     print(f"{'Model':<22s}  {'MAE':>10s}  {'RMSE':>10s}  {'R²':>10s}  {'Time (s)':>9s}")
@@ -128,21 +99,19 @@ def main():
 
     print("=" * 72)
 
-    # 4. Pick best model (lowest RMSE) ────────────────────────
-    results.sort(key=lambda r: r[2])          # sort by RMSE ascending
+    results.sort(key=lambda r: r[2])
     best_name, best_mae, best_rmse, best_r2, _, best_model = results[0]
 
-    print(f"\n🏆 Best model: {best_name}")
+    print(f"\nBest model: {best_name}")
     print(f"   MAE  = {best_mae:.6f}")
     print(f"   RMSE = {best_rmse:.6f}")
     print(f"   R²   = {best_r2:.6f}")
 
-    # 5. Save best model + artefacts ──────────────────────────
     joblib.dump(best_model, os.path.join(MODEL_DIR, "model.pkl"))
     joblib.dump(scaler,     os.path.join(MODEL_DIR, "scaler.pkl"))
     joblib.dump(le,         os.path.join(MODEL_DIR, "label_encoder.pkl"))
 
-    print(f"\n✅ Saved best model ({best_name}), scaler, and label-encoder to {MODEL_DIR}/")
+    print(f"\nSaved best model ({best_name}), scaler, and label-encoder to {MODEL_DIR}/")
 
 
 if __name__ == "__main__":
