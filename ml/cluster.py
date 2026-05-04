@@ -5,6 +5,9 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+
+
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -56,7 +59,8 @@ def main():
         "features": cluster_features,
     }
     joblib.dump(cluster_bundle, os.path.join(MODEL_DIR, "kmeans.pkl"))
-
+    score = silhouette_score(X_scaled, kmeans.labels_)
+    print(f"\nSilhouette Score: {score:.2f}")
     print(f"\n Saved cluster bundle to  {MODEL_DIR}/kmeans.pkl")
 
 
